@@ -674,6 +674,14 @@ async function salvarGerenciaOS(){
   if(pecas.length){const {error:pe}=await supabaseClient.from("service_order_parts").insert(pecas);if(pe){alert("Financeiro salvo, mas erro nas peças: "+pe.message);return;}}
   document.getElementById("modalOS").classList.remove("open");await carregarOrdens();alert("Ordem de Serviço atualizada!");
 }
+async function alterarStatusOS(id, novoStatus){
+  const {error}=await supabaseClient.from("service_orders").update({status:novoStatus,updated_at:new Date().toISOString()}).eq("id",id);
+  if(error){alert("Não foi possível atualizar o status: "+error.message);await carregarOrdens();return;}
+  await carregarOrdens();
+  if(novoStatus==="Pronto para retirada"){
+    alert("Status atualizado! O botão Avisar no WhatsApp está disponível nesta OS.");
+  }
+}
 function imprimirOSPorId(id){const o=ordensServico.find(x=>Number(x.id)===Number(id));if(o)imprimirOrdem(o);}
 function imprimirOrdem(o){
   const item=(t,v,w=false)=>`<div class="print-item ${w?"print-wide":""}"><strong>${t}</strong>${escapar(v||"Não informado")}</div>`;
