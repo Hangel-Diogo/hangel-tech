@@ -247,6 +247,7 @@ td {
 .os-list{margin-top:28px}.os-table{min-width:850px}
 .os-table select{background:#26384c;color:#fff;border:1px solid #40536a;padding:7px;border-radius:6px}
 .os-number{color:#19c8ff;font-weight:bold}
+.os-modal{display:none;position:fixed;inset:0;background:#000b;z-index:50;overflow:auto;padding:24px}.os-modal.open{display:block}.os-modal-box{max-width:850px;margin:25px auto;background:#101b2c;border:1px solid #28445f;border-radius:14px;padding:22px}.os-modal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.os-modal input,.os-modal select,.os-modal textarea{width:100%;background:#080e19;color:#fff;border:1px solid #28445f;border-radius:8px;padding:11px;font:inherit}.os-modal label{display:block;color:#a9bfd8;font-size:13px;margin:0 0 6px}.os-modal .full{grid-column:1/-1}.os-modal textarea{min-height:100px}.os-help{font-size:12px;color:#91a8c2;margin-top:5px}@media(max-width:600px){.os-modal{padding:8px}.os-modal-box{padding:14px}.os-modal-grid{grid-template-columns:1fr}.os-modal .full{grid-column:auto}}
 @media(max-width:600px){.os-form-grid{grid-template-columns:1fr}.os-field.full{grid-column:auto}.os-panel{padding:15px}}
 @media print{
  body *{visibility:hidden!important}
@@ -375,17 +376,29 @@ td {
           <select id="filtroStatusOS">
             <option value="">Todos os status</option><option>Recebido</option><option>Em diagnóstico</option>
             <option>Aguardando aprovação</option><option>Aguardando peça</option><option>Em conserto</option>
-            <option>Concluído</option><option>Entregue</option><option>Cancelado</option>
+            <option>Pronto para retirada</option><option>Entregue</option><option>Cancelado</option>
           </select>
           <button class="refresh" type="button" id="atualizarOS">Atualizar OS</button>
         </div>
         <div class="table-wrapper"><table class="os-table">
-          <thead><tr><th>Nº OS</th><th>Cliente</th><th>Telefone</th><th>Aparelho</th><th>Entrada</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="listaOS"><tr><td colspan="7" class="message">Abra Ordens de Serviço para carregar.</td></tr></tbody>
+          <thead><tr><th>Nº OS</th><th>Cliente</th><th>Telefone</th><th>Aparelho</th><th>Entrada</th><th>Status</th><th>Financeiro</th><th>Ações</th></tr></thead>
+          <tbody id="listaOS"><tr><td colspan="8" class="message">Abra Ordens de Serviço para carregar.</td></tr></tbody>
         </table></div>
       </div>
     </section>
     <div id="printArea"></div>
+    <div id="modalOS" class="os-modal" aria-hidden="true"><div class="os-modal-box">
+      <h2 class="section-title">Gerenciar Ordem de Serviço</h2><input type="hidden" id="editOSId">
+      <div class="os-modal-grid">
+        <div><label>Aprovação do orçamento</label><select id="editAprovacao"><option>Pendente</option><option>Aprovado</option><option>Recusado</option></select></div>
+        <div><label>Valor da mão de obra (R$)</label><input id="editMaoObra" type="number" min="0" step="0.01"></div>
+        <div class="full"><label>Peças utilizadas (uma por linha: descrição | quantidade | valor unitário)</label><textarea id="editPecas" placeholder="Tela | 1 | 350,00&#10;Bateria | 1 | 120,00"></textarea><div class="os-help">Exemplo: Tela | 1 | 350,00. Use vírgula ou ponto nos valores.</div></div>
+        <div><label>Desconto (R$)</label><input id="editDesconto" type="number" min="0" step="0.01"></div>
+        <div><label>Valor já pago (R$)</label><input id="editPago" type="number" min="0" step="0.01"></div>
+        <div><label>Pagamento</label><select id="editPagamento"><option>Pendente</option><option>Parcial</option><option>Pago</option></select></div>
+        <div><label>Valor total calculado</label><input id="editTotal" readonly></div>
+      </div><div class="os-actions"><button class="primary-btn" type="button" id="salvarGerenciaOS">Salvar alterações</button><button class="secondary-btn" type="button" id="fecharGerenciaOS">Fechar</button></div>
+    </div></div>
 </main>
 
 <script>
@@ -591,7 +604,7 @@ document.getElementById("logout").addEventListener("click", async () => {
 
 
 let ordensServico = [];
-const STATUS_OS = ["Recebido","Em diagnóstico","Aguardando aprovação","Aguardando peça","Em conserto","Concluído","Entregue","Cancelado"];
+const STATUS_OS = ["Recebido","Em diagnóstico","Aguardando aprovação","Aguardando peça","Em conserto","Pronto para retirada","Entregue","Cancelado"];
 function mostrarAba(aba) {
   const ag = aba === "agendamentos";
   document.getElementById("areaAgendamentos").style.display = ag ? "block" : "none";
@@ -629,13 +642,37 @@ function dataOS(d){return d?new Date(d).toLocaleDateString("pt-BR"):"—";}
 function renderizarOrdens(){
   const lista=document.getElementById("listaOS"),busca=document.getElementById("buscaOS").value.toLowerCase(),filtro=document.getElementById("filtroStatusOS").value;
   const itens=ordensServico.filter(o=>[numeroOS(o),o.customer_name,o.customer_phone,o.device_brand,o.device_model].join(" ").toLowerCase().includes(busca)&&(!filtro||o.status===filtro));
-  if(!itens.length){lista.innerHTML='<tr><td colspan="7" class="message">Nenhuma Ordem de Serviço encontrada.</td></tr>';return;}
-  lista.innerHTML=itens.map(o=>`<tr><td class="os-number">OS-${escapar(numeroOS(o))}</td><td>${escapar(o.customer_name)}</td><td>${escapar(o.customer_phone)}</td><td>${escapar([o.device_brand,o.device_model].filter(Boolean).join(" "))}</td><td>${dataOS(o.created_at)}</td><td><select onchange="alterarStatusOS(${Number(o.id)},this.value)">${STATUS_OS.map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></td><td><button class="secondary-btn" type="button" onclick="imprimirOSPorId(${Number(o.id)})">Imprimir</button></td></tr>`).join("");
+  if(!itens.length){lista.innerHTML='<tr><td colspan="8" class="message">Nenhuma Ordem de Serviço encontrada.</td></tr>';return;}
+  lista.innerHTML=itens.map(o=>{
+    const total=Number(o.final_value||o.estimated_value||0);
+    const digitos=String(o.customer_phone||"").replace(/\D/g,"");
+    const telefone=digitos?(digitos.startsWith("55")?digitos:"55"+digitos):"";
+    const mensagem=encodeURIComponent(`Olá, ${o.customer_name}! Aqui é da HANGEL TECH. Seu aparelho ${[o.device_brand,o.device_model].filter(Boolean).join(" ")} (OS-${numeroOS(o)}) está pronto para retirada. Quando puder, venha buscá-lo. Obrigado pela preferência!`);
+    const aviso=o.status==="Pronto para retirada"&&telefone?`<a class="whatsapp" href="https://wa.me/${telefone}?text=${mensagem}" target="_blank" rel="noopener">Avisar no WhatsApp</a>`:"";
+    return `<tr><td class="os-number">OS-${escapar(numeroOS(o))}</td><td>${escapar(o.customer_name)}</td><td>${escapar(o.customer_phone)}</td><td>${escapar([o.device_brand,o.device_model].filter(Boolean).join(" "))}</td><td>${dataOS(o.created_at)}</td><td><select onchange="alterarStatusOS(${Number(o.id)},this.value)">${STATUS_OS.map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></td><td>${total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}<br><small>${escapar(o.payment_status||"Pendente")}</small></td><td><button class="secondary-btn" type="button" onclick="abrirGerenciaOS(${Number(o.id)})">Gerenciar</button> <button class="secondary-btn" type="button" onclick="imprimirOSPorId(${Number(o.id)})">Imprimir</button> ${aviso}</td></tr>`;
+  }).join("");
 }
-async function alterarStatusOS(id,status){
-  const {error}=await supabaseClient.from("service_orders").update({status,updated_at:new Date().toISOString()}).eq("id",id);
-  if(error){alert("Erro ao atualizar status: "+error.message);await carregarOrdens();return;}
-  const o=ordensServico.find(x=>Number(x.id)===Number(id));if(o)o.status=status;renderizarOrdens();
+function valorCampo(id){return Number(String(document.getElementById(id).value||"0").replace(",","."))||0;}
+function calcularTotalModal(){
+  let pecas=0;document.getElementById("editPecas").value.split(/\r?\n/).filter(Boolean).forEach(l=>{const a=l.split("|");if(a.length>=3)pecas+=(Number(a[1].trim().replace(",","."))||0)*(Number(a[2].trim().replace(",","."))||0);});
+  const total=Math.max(0,valorCampo("editMaoObra")+pecas-valorCampo("editDesconto"));document.getElementById("editTotal").value=total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  const pago=valorCampo("editPago");document.getElementById("editPagamento").value=pago<=0?"Pendente":pago+0.001>=total?"Pago":"Parcial";return {total,pecas};
+}
+async function abrirGerenciaOS(id){
+  const o=ordensServico.find(x=>Number(x.id)===Number(id));if(!o)return;
+  document.getElementById("editOSId").value=o.id;document.getElementById("editAprovacao").value=o.budget_status||"Pendente";document.getElementById("editMaoObra").value=o.labor_value||0;document.getElementById("editDesconto").value=o.discount_value||0;document.getElementById("editPago").value=o.paid_value||0;document.getElementById("editPagamento").value=o.payment_status||"Pendente";
+  const {data,error}=await supabaseClient.from("service_order_parts").select("description,quantity,unit_value").eq("service_order_id",id);if(error){alert("Erro ao carregar peças: "+error.message);return;}
+  document.getElementById("editPecas").value=(data||[]).map(x=>`${x.description} | ${x.quantity} | ${Number(x.unit_value).toFixed(2)}`).join("\n");calcularTotalModal();document.getElementById("modalOS").classList.add("open");
+}
+async function salvarGerenciaOS(){
+  const id=Number(document.getElementById("editOSId").value),calc=calcularTotalModal(),pago=valorCampo("editPago");if(pago>calc.total){alert("O valor pago não pode ser maior que o total do serviço.");return;}
+  const aprov=document.getElementById("editAprovacao").value;
+  const update={budget_status:aprov,budget_approved_at:aprov==="Aprovado"?new Date().toISOString():null,labor_value:valorCampo("editMaoObra"),discount_value:valorCampo("editDesconto"),paid_value:pago,payment_status:document.getElementById("editPagamento").value,final_value:calc.total,updated_at:new Date().toISOString()};
+  const {error}=await supabaseClient.from("service_orders").update(update).eq("id",id);if(error){alert("Erro ao salvar: "+error.message);return;}
+  const {error:delError}=await supabaseClient.from("service_order_parts").delete().eq("service_order_id",id);if(delError){alert("Financeiro salvo, mas erro ao atualizar peças: "+delError.message);return;}
+  const pecas=document.getElementById("editPecas").value.split(/\r?\n/).filter(x=>x.trim()).map(l=>{const a=l.split("|");return {service_order_id:id,description:(a[0]||"").trim(),quantity:Number((a[1]||"1").trim().replace(",","."))||1,unit_value:Number((a[2]||"0").trim().replace(",","."))||0};}).filter(x=>x.description);
+  if(pecas.length){const {error:pe}=await supabaseClient.from("service_order_parts").insert(pecas);if(pe){alert("Financeiro salvo, mas erro nas peças: "+pe.message);return;}}
+  document.getElementById("modalOS").classList.remove("open");await carregarOrdens();alert("Ordem de Serviço atualizada!");
 }
 function imprimirOSPorId(id){const o=ordensServico.find(x=>Number(x.id)===Number(id));if(o)imprimirOrdem(o);}
 function imprimirOrdem(o){
@@ -658,6 +695,9 @@ function imprimirOrdem(o){
 document.getElementById("buscaOS").addEventListener("input",renderizarOrdens);
 document.getElementById("filtroStatusOS").addEventListener("change",renderizarOrdens);
 document.getElementById("atualizarOS").addEventListener("click",carregarOrdens);
+document.getElementById("fecharGerenciaOS").addEventListener("click",()=>document.getElementById("modalOS").classList.remove("open"));
+document.getElementById("salvarGerenciaOS").addEventListener("click",salvarGerenciaOS);
+["editMaoObra","editDesconto","editPago","editPecas"].forEach(id=>document.getElementById(id).addEventListener("input",calcularTotalModal));
 
 
 iniciarPainel();
