@@ -617,3 +617,57 @@ footer .container {
     }
 
 }
+
+/* DESTAQUE INICIAL COM CARICATURA */
+
+.hero-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 40px;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+}
+
+.hero-image img {
+    width: 100%;
+    max-width: 430px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 30px rgba(0, 217, 245, 0.15));
+}
+
+/* CELULAR */
+@media (max-width: 768px) {
+    .hero-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .hero-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-image img {
+        max-width: 320px;
+    }
+}
+
