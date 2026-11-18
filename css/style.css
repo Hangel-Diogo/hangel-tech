@@ -635,4 +635,111 @@ footer .container {
     }
 }
 
+/* =================================
+   MENU RESPONSIVO - HANGEL TECH
+================================= */
+
+/* Evita rolagem horizontal */
+html,
+body {
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+@media (max-width: 768px) {
+
+    header {
+        width: 100%;
+    }
+
+    header .container {
+        position: relative;
+        min-height: 68px;
+        padding: 0 16px;
+        gap: 10px;
+        box-sizing: border-box;
+    }
+
+    /* Logo */
+    .logo {
+        font-size: 21px;
+        white-space: nowrap;
+    }
+
+    /* Esconde botão grande do cabeçalho */
+    .btn-header {
+        display: none;
+    }
+
+    /* Botão hambúrguer */
+    .menu-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        font-size: 25px;
+        color: var(--cyan);
+    }
+
+    /* Menu fechado */
+    .menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: 15px 18px 20px;
+        box-sizing: border-box;
+
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+
+        background: #020b16;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+
+        z-index: 999;
+    }
+
+    /* Menu aberto */
+    .menu.active {
+        display: flex;
+    }
+
+    .menu a {
+        display: block;
+        width: 100%;
+        padding: 15px 5px;
+        box-sizing: border-box;
+        border-bottom: 1px solid rgba(22, 74, 112, 0.4);
+        font-size: 16px;
+    }
+
+    .menu a:last-child {
+        border-bottom: none;
+    }
+
+    .menu a:hover {
+        color: var(--cyan);
+        padding-left: 12px;
+    }
+}
+
+/* Ajuste para telas muito estreitas */
+@media (max-width: 380px) {
+    .logo {
+        font-size: 19px;
+    }
+
+    header .container {
+        padding: 0 12px;
+    }
+}
+
+
 
