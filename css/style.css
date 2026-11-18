@@ -1,0 +1,619 @@
+
+/* =================================
+   HANGEL TECH - IDENTIDADE VISUAL
+================================= */
+
+:root {
+    --bg: #061426;
+    --bg-dark: #020b16;
+    --panel: #0a2038;
+    --cyan: #08d9f5;
+    --blue: #087bff;
+    --white: #f4f8ff;
+    --muted: #a8bad0;
+    --line: #164a70;
+    --yellow: #ffd21c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background:
+        radial-gradient(
+            ellipse at 70% 0%,
+            #0c3155 0,
+            transparent 40%
+        ),
+        var(--bg);
+
+    color: var(--white);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+}
+
+.container {
+    width: min(1160px, 92%);
+    margin: auto;
+}
+
+/* =================================
+   CABEÇALHO
+================================= */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    background: rgba(2, 11, 22, 0.96);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(12px);
+}
+
+header .container {
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: white;
+}
+
+.logo span {
+    color: var(--cyan);
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.menu a {
+    font-size: 14px;
+    font-weight: 700;
+    color: #d8e5f3;
+    transition: .3s;
+}
+
+.menu a:hover {
+    color: var(--cyan);
+}
+
+.btn-header,
+.btn-primary,
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 13px 20px;
+    border-radius: 10px;
+
+    font-weight: 800;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.btn-header,
+.btn-primary {
+    color: #001321;
+
+    background: linear-gradient(
+        110deg,
+        var(--cyan),
+        var(--blue)
+    );
+
+    box-shadow: 0 0 20px #08d9f533;
+}
+
+.btn-secondary {
+    border: 1px solid var(--cyan);
+    color: white;
+}
+
+.btn-header:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.15);
+}
+
+.menu-mobile {
+    display: none;
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* =================================
+   INÍCIO
+================================= */
+
+#inicio {
+    min-height: 520px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 80px 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(2, 11, 22, .2),
+            rgba(2, 11, 22, .8)
+        );
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.tag {
+    color: var(--cyan);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.hero-content h1 {
+    font-size: clamp(42px, 6vw, 70px);
+    line-height: 1.08;
+    margin: 20px 0;
+    letter-spacing: -2px;
+}
+
+.hero-content h1 span {
+    display: block;
+    color: var(--cyan);
+    text-shadow: 0 0 25px #08d9f555;
+}
+
+.hero-content p {
+    max-width: 580px;
+    font-size: 18px;
+    color: var(--muted);
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+/* =================================
+   TÍTULOS DAS SEÇÕES
+================================= */
+
+section {
+    padding: 65px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.section-title span {
+    color: var(--cyan);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.section-title h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    margin: 8px 0;
+}
+
+.section-title p {
+    color: var(--muted);
+}
+
+/* =================================
+   SERVIÇOS
+================================= */
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.service-card {
+    background: linear-gradient(
+        145deg,
+        #0c2742,
+        #071a2e
+    );
+
+    border: 1px solid var(--line);
+    border-radius: 16px;
+
+    padding: 25px;
+
+    transition: .3s;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--cyan);
+    box-shadow: 0 10px 30px #08d9f522;
+}
+
+.service-icon {
+    width: 50px;
+    height: 50px;
+
+    display: grid;
+    place-items: center;
+
+    background: #062d48;
+    border: 1px solid #087b9b;
+    border-radius: 13px;
+
+    color: var(--cyan);
+    font-size: 24px;
+
+    margin-bottom: 15px;
+}
+
+.service-card h3 {
+    font-size: 19px;
+    margin-bottom: 8px;
+}
+
+.service-card p {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* =================================
+   PREÇOS
+================================= */
+
+#lista-precos {
+    max-width: 850px;
+    margin: auto;
+}
+
+.price-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    padding: 16px;
+
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.price-item strong {
+    font-size: 14px;
+}
+
+.price-item span {
+    color: var(--cyan);
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.price-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 18px;
+}
+
+/* =================================
+   AGENDAMENTO
+================================= */
+
+.booking-layout {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.booking-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 25px;
+}
+
+.booking-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.booking-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form textarea {
+    width: 100%;
+    padding: 13px;
+
+    border: 1px solid #315978;
+    border-radius: 9px;
+
+    background: #06182a;
+    color: white;
+
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-form textarea:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px #08d9f522;
+}
+
+.booking-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.booking-form button {
+    width: 100%;
+    border: none;
+    font-size: 15px;
+}
+
+/* =================================
+   COMO FUNCIONA
+================================= */
+
+.steps {
+    display: grid;
+    gap: 22px;
+}
+
+.step {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.step-number {
+    min-width: 38px;
+    height: 38px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+    background: var(--cyan);
+    color: #001321;
+
+    font-weight: 900;
+}
+
+.step h3 {
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+
+.step p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* =================================
+   RETIRADA EM RESIDÊNCIA
+================================= */
+
+#retirada {
+    background: linear-gradient(
+        100deg,
+        #08294a,
+        #071a2c
+    );
+
+    border-top: 1px solid var(--cyan);
+    border-bottom: 1px solid var(--cyan);
+
+    text-align: center;
+}
+
+#retirada h2 {
+    font-size: clamp(25px, 4vw, 36px);
+    margin-bottom: 10px;
+}
+
+#retirada p {
+    color: var(--muted);
+    margin-bottom: 22px;
+}
+
+/* =================================
+   RODAPÉ
+================================= */
+
+footer {
+    background: var(--bg-dark);
+    border-top: 1px solid var(--line);
+    padding: 35px 0;
+}
+
+footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-brand p,
+.footer-info {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* =================================
+   MENSAGENS
+================================= */
+
+.toast {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #102e48;
+    color: #d9faff;
+    border: 1px solid var(--cyan);
+    font-size: 14px;
+}
+
+/* =================================
+   RESPONSIVIDADE
+================================= */
+
+@media (max-width: 900px) {
+
+    .menu {
+        gap: 12px;
+    }
+
+    .menu a {
+        font-size: 12px;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .booking-layout {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    header .container {
+        min-height: 68px;
+    }
+
+    .menu {
+        display: none;
+
+        position: absolute;
+        top: 68px;
+        left: 0;
+
+        width: 100%;
+
+        flex-direction: column;
+        align-items: stretch;
+
+        background: #04101e;
+        padding: 20px;
+
+        border-bottom: 1px solid var(--line);
+    }
+
+    .menu.active {
+        display: flex;
+    }
+
+    .menu a {
+        font-size: 15px;
+        padding: 8px;
+    }
+
+    .btn-header {
+        display: none;
+    }
+
+    .menu-mobile {
+        display: block;
+    }
+
+    #inicio {
+        min-height: auto;
+        padding: 65px 0;
+    }
+
+    .hero-content h1 {
+        font-size: 43px;
+    }
+
+    .hero-content p {
+        font-size: 16px;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .price-list {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-form {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+
+    section {
+        padding: 45px 0;
+    }
+
+}

@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HANGEL TECH | Administração</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #04111f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: white;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 420px;
+    background: #0b2035;
+    border: 1px solid #124b70;
+    border-radius: 18px;
+    padding: 40px 32px;
+    box-shadow: 0 0 40px rgba(0, 174, 255, .10);
+}
+
+.logo {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.logo span {
+    color: #08d5ee;
+}
+
+.subtitle {
+    text-align: center;
+    color: #9bb6cd;
+    font-size: 13px;
+    margin-bottom: 35px;
+}
+
+h2 {
+    font-size: 21px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    background: #061727;
+    border: 1px solid #285675;
+    border-radius: 9px;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+input:focus {
+    border-color: #08d5ee;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(90deg, #08d5ee, #087cff);
+    color: #001323;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+#mensagem {
+    margin-top: 18px;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.rodape {
+    text-align: center;
+    color: #66839c;
+    font-size: 11px;
+    margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <div class="logo">
+        HANGEL <span>TECH</span>
+    </div>
+
+    <div class="subtitle">
+        SISTEMA DE GESTÃO | ASSISTÊNCIA TÉCNICA
+    </div>
+
+    <h2>Acesso administrativo</h2>
+
+    <form id="loginForm">
+
+        <label>E-mail</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="Seu e-mail"
+            required
+        >
+
+        <label>Senha</label>
+        <input
+            type="password"
+            id="senha"
+            placeholder="Sua senha"
+            required
+        >
+
+        <button type="submit" id="btnEntrar">
+            ENTRAR NO SISTEMA
+        </button>
+
+    </form>
+
+    <div id="mensagem"></div>
+
+    <div class="rodape">
+        HANGEL TECH © 2026<br>
+        Sistema administrativo
+    </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://gunkzswgncpbwxqtcrfw.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_-vw-_BBGrEF32ITj6CcA6Q_HdLXyUCg";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+// Verificar se já existe uma sessão
+(async function verificarSessao() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (!error && data.session) {
+        window.location.replace("painel.html");
+    }
+})();
+
+// Login
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value;
+    const botao = document.getElementById("btnEntrar");
+    const mensagem = document.getElementById("mensagem");
+
+    botao.disabled = true;
+    botao.textContent = "VERIFICANDO...";
+    mensagem.textContent = "";
+
+    try {
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: senha
+        });
+
+        if (error) throw error;
+
+        if (!data.session) {
+            throw new Error("Não foi possível iniciar a sessão.");
+        }
+
+        mensagem.style.color = "#08d5ee";
+        mensagem.textContent = "Acesso autorizado! Entrando...";
+
+        window.location.href = "painel.html";
+
+    } catch (error) {
+
+        mensagem.style.color = "#ff7777";
+        mensagem.textContent = "E-mail ou senha incorretos. Verifique seus dados.";
+
+        console.error("Erro no login:", error);
+
+    } finally {
+
+        botao.disabled = false;
+        botao.textContent = "ENTRAR NO SISTEMA";
+
+    }
+
+});
+</script>
+
+</body>
+</html>

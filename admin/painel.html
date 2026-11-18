@@ -1,0 +1,520 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo | HANGEL TECH</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #080e19;
+    color: #eaf2ff;
+    min-height: 100vh;
+}
+
+header {
+    background: #101b2c;
+    border-bottom: 1px solid #1d3652;
+    padding: 20px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: bold;
+    color: #19c8ff;
+}
+
+.logo span {
+    color: white;
+}
+
+header button {
+    background: #182b40;
+    color: white;
+    border: 1px solid #28445f;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 35px 5%;
+}
+
+h1 {
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #8fa6c0;
+    margin-bottom: 30px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 35px;
+}
+
+.card {
+    background: #101b2c;
+    border: 1px solid #1d3652;
+    padding: 23px;
+    border-radius: 13px;
+}
+
+.card small {
+    color: #91a8c2;
+    font-size: 13px;
+}
+
+.card strong {
+    display: block;
+    font-size: 32px;
+    margin-top: 12px;
+    color: #19c8ff;
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+    background: #101b2c;
+    color: white;
+    border: 1px solid #28445f;
+    border-radius: 8px;
+    padding: 12px;
+    outline: none;
+}
+
+.filters input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filters select {
+    min-width: 180px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    background: #101b2c;
+    border: 1px solid #1d3652;
+    border-radius: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 950px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #1d3048;
+    font-size: 13px;
+}
+
+th {
+    color: #19c8ff;
+    background: #142238;
+}
+
+td {
+    color: #dce8f7;
+}
+
+.status {
+    padding: 7px 9px;
+    border-radius: 6px;
+    background: #26384c;
+    color: white;
+    border: 1px solid #40536a;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.whatsapp {
+    display: inline-block;
+    background: #0c9e65;
+    color: white;
+    padding: 9px 12px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.whatsapp:hover {
+    background: #087d50;
+}
+
+.message {
+    color: #91a8c2;
+    padding: 25px;
+    text-align: center;
+}
+
+.error {
+    color: #ff7777;
+}
+
+.refresh {
+    background: #087fa8;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 18px;
+}
+
+@media(max-width: 800px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .container {
+        padding: 25px 4%;
+    }
+}
+
+@media(max-width: 450px) {
+    .cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .card strong {
+        font-size: 25px;
+    }
+
+    header {
+        padding: 16px 4%;
+    }
+
+    .logo {
+        font-size: 19px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">HANGEL <span>TECH</span></div>
+    <button id="logout">Sair do sistema</button>
+</header>
+
+<main class="container">
+
+    <h1>Painel administrativo</h1>
+    <p class="subtitle">Gerenciamento de clientes e serviços</p>
+
+    <section class="cards">
+        <div class="card">
+            <small>Total de agendamentos</small>
+            <strong id="total">0</strong>
+        </div>
+
+        <div class="card">
+            <small>Pendentes</small>
+            <strong id="pendentes">0</strong>
+        </div>
+
+        <div class="card">
+            <small>Em andamento</small>
+            <strong id="andamento">0</strong>
+        </div>
+
+        <div class="card">
+            <small>Concluídos</small>
+            <strong id="concluidos">0</strong>
+        </div>
+    </section>
+
+    <h2 class="section-title">Agendamentos recebidos</h2>
+
+    <button class="refresh" id="refresh">Atualizar agendamentos</button>
+
+    <div class="filters">
+        <input
+            type="text"
+            id="busca"
+            placeholder="Buscar por cliente, telefone ou aparelho..."
+        >
+
+        <select id="filtroStatus">
+            <option value="">Todos os status</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Concluído">Concluído</option>
+            <option value="Cancelado">Cancelado</option>
+        </select>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Contato</th>
+                    <th>Aparelho</th>
+                    <th>Serviço</th>
+                    <th>Data desejada</th>
+                    <th>Horário</th>
+                    <th>Status</th>
+                    <th>WhatsApp</th>
+                </tr>
+            </thead>
+
+            <tbody id="lista">
+                <tr>
+                    <td colspan="8" class="message">Carregando agendamentos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<script>
+const SUPABASE_URL = "https://gunkzswgncpbwxqtcrfw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_-vw-_BBGrEF32ITj6CcA6Q_HdLXyUCg";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let agendamentos = [];
+
+async function iniciarPainel() {
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+    if (error || !user) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    const { data: administrador, error: erroAdmin } =
+        await supabaseClient.rpc("is_admin");
+
+    if (erroAdmin || administrador !== true) {
+        alert("Acesso não autorizado.");
+        await supabaseClient.auth.signOut();
+        window.location.href = "index.html";
+        return;
+    }
+
+    await carregarAgendamentos();
+}
+
+async function carregarAgendamentos() {
+    const lista = document.getElementById("lista");
+
+    lista.innerHTML = `
+        <tr><td colspan="8" class="message">Carregando...</td></tr>
+    `;
+
+    const { data, error } = await supabaseClient
+        .from("appointments")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        lista.innerHTML = `
+            <tr><td colspan="8" class="message error">
+                Erro ao carregar: ${escapar(error.message)}
+            </td></tr>
+        `;
+        return;
+    }
+
+    agendamentos = data || [];
+
+    atualizarIndicadores();
+    renderizarAgendamentos();
+}
+
+function atualizarIndicadores() {
+    document.getElementById("total").textContent =
+        agendamentos.length;
+
+    document.getElementById("pendentes").textContent =
+        agendamentos.filter(a => normalizarStatus(a.status) === "pendente").length;
+
+    document.getElementById("andamento").textContent =
+        agendamentos.filter(a => normalizarStatus(a.status) === "em andamento").length;
+
+    document.getElementById("concluidos").textContent =
+        agendamentos.filter(a => normalizarStatus(a.status) === "concluído").length;
+}
+
+function normalizarStatus(status) {
+    return (status || "Pendente").trim().toLowerCase();
+}
+
+function escapar(valor) {
+    return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[caractere]);
+}
+
+function renderizarAgendamentos() {
+    const lista = document.getElementById("lista");
+    const busca = document.getElementById("busca").value.toLowerCase();
+    const filtro = document.getElementById("filtroStatus").value;
+
+    const filtrados = agendamentos.filter(a => {
+        const texto = [
+            a.customer_name,
+            a.phone,
+            a.brand,
+            a.device_model,
+            a.service
+        ].join(" ").toLowerCase();
+
+        const correspondeBusca = texto.includes(busca);
+
+        const correspondeStatus = !filtro ||
+            normalizarStatus(a.status) === filtro.toLowerCase();
+
+        return correspondeBusca && correspondeStatus;
+    });
+
+    if (!filtrados.length) {
+        lista.innerHTML = `
+            <tr><td colspan="8" class="message">
+                Nenhum agendamento encontrado.
+            </td></tr>
+        `;
+        return;
+    }
+
+    lista.innerHTML = filtrados.map(a => {
+        const telefone = String(a.phone || "").replace(/\D/g, "");
+        const telefoneWhats = telefone.startsWith("55")
+            ? telefone
+            : "55" + telefone;
+
+        const mensagem = encodeURIComponent(
+            `Olá, ${a.customer_name}! Aqui é da HANGEL TECH. Estou entrando em contato sobre seu agendamento de ${a.service}.`
+        );
+
+        const data = a.preferred_date
+            ? String(a.preferred_date).split("-").reverse().join("/")
+            : "Não informado";
+
+        const statusAtual = ["Pendente", "Em andamento", "Concluído", "Cancelado"]
+            .find(s => s.toLowerCase() === normalizarStatus(a.status))
+            || "Pendente";
+
+        return `
+            <tr>
+                <td>${escapar(a.customer_name)}</td>
+                <td>${escapar(a.phone)}</td>
+                <td>${escapar(a.brand)} ${escapar(a.device_model)}</td>
+                <td>${escapar(a.service)}</td>
+                <td>${escapar(data)}</td>
+                <td>${escapar(a.preferred_period || "Não informado")}</td>
+                <td>
+                    <select class="status"
+                        onchange="alterarStatus('${escapar(a.id)}', this.value)">
+                        ${["Pendente", "Em andamento", "Concluído", "Cancelado"]
+                            .map(s => `
+                                <option value="${s}" ${s === statusAtual ? "selected" : ""}>
+                                    ${s}
+                                </option>
+                            `).join("")}
+                    </select>
+                </td>
+                <td>
+                    ${telefone ? `
+                        <a class="whatsapp"
+                           href="https://wa.me/${telefoneWhats}?text=${mensagem}"
+                           target="_blank" rel="noopener">
+                           WhatsApp
+                        </a>
+                    ` : "Sem telefone"}
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+async function alterarStatus(id, novoStatus) {
+    const { error } = await supabaseClient
+        .from("appointments")
+        .update({ status: novoStatus })
+        .eq("id", id);
+
+    if (error) {
+        alert("Não foi possível atualizar o status: " + error.message);
+        await carregarAgendamentos();
+        return;
+    }
+
+    const agendamento = agendamentos.find(a => String(a.id) === String(id));
+
+    if (agendamento) {
+        agendamento.status = novoStatus;
+    }
+
+    atualizarIndicadores();
+    renderizarAgendamentos();
+}
+
+document.getElementById("busca").addEventListener("input", renderizarAgendamentos);
+document.getElementById("filtroStatus").addEventListener("change", renderizarAgendamentos);
+
+document.getElementById("refresh").addEventListener("click", carregarAgendamentos);
+
+document.getElementById("logout").addEventListener("click", async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = "index.html";
+});
+
+iniciarPainel();
+</script>
+
+</body>
+</html>
