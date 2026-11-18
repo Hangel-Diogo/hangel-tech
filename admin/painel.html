@@ -230,6 +230,40 @@ td {
         font-size: 19px;
     }
 }
+
+.nav-actions{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}
+.nav-actions button,.primary-btn,.secondary-btn{border:0;border-radius:8px;padding:12px 16px;cursor:pointer;font-weight:bold}
+.nav-actions button,.primary-btn{background:#087fa8;color:#fff}
+.secondary-btn{background:#26384c;color:#fff;border:1px solid #40536a}
+.os-panel{display:none;background:#101b2c;border:1px solid #1d3652;border-radius:13px;padding:22px;margin:0 0 28px}
+.os-panel.active{display:block}
+.os-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.os-field{display:flex;flex-direction:column;gap:7px}
+.os-field.full{grid-column:1/-1}
+.os-field label{font-size:13px;color:#a9bfd8}
+.os-field input,.os-field textarea{width:100%;background:#080e19;color:#fff;border:1px solid #28445f;border-radius:8px;padding:11px;font:inherit}
+.os-field textarea{min-height:82px;resize:vertical}
+.os-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.os-list{margin-top:28px}.os-table{min-width:850px}
+.os-table select{background:#26384c;color:#fff;border:1px solid #40536a;padding:7px;border-radius:6px}
+.os-number{color:#19c8ff;font-weight:bold}
+@media(max-width:600px){.os-form-grid{grid-template-columns:1fr}.os-field.full{grid-column:auto}.os-panel{padding:15px}}
+@media print{
+ body *{visibility:hidden!important}
+ #printArea,#printArea *{visibility:visible!important}
+ #printArea{display:block!important;position:absolute;left:0;top:0;width:100%;padding:12mm;color:#111;background:#fff;font:12px Arial}
+ .print-head{display:flex;justify-content:space-between;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:16px}
+ .print-head h1{font-size:22px;color:#111}.print-os-num{font-size:18px;font-weight:bold}
+ .print-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+ .print-item{border-bottom:1px solid #bbb;padding:7px 0;min-height:34px}
+ .print-item strong{display:block;font-size:10px;text-transform:uppercase;color:#555;margin-bottom:4px}
+ .print-wide{grid-column:1/-1;white-space:pre-wrap}
+ .print-signatures{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:65px;text-align:center}
+ .print-signatures div{border-top:1px solid #111;padding-top:8px}
+ .print-note{margin-top:24px;font-size:10px;color:#444}
+}
+#printArea{display:none}
+
 </style>
 </head>
 
@@ -267,6 +301,11 @@ td {
         </div>
     </section>
 
+    <div class="nav-actions">
+        <button type="button" id="btnAgendamentos">Agendamentos</button>
+        <button type="button" id="btnOrdens">Ordens de Serviço</button>
+    </div>
+    <section id="areaAgendamentos">
     <h2 class="section-title">Agendamentos recebidos</h2>
 
     <button class="refresh" id="refresh">Atualizar agendamentos</button>
@@ -309,7 +348,44 @@ td {
             </tbody>
         </table>
     </div>
+    </section>
 
+    <section id="areaOrdens" class="os-panel">
+      <h2 class="section-title">Nova Ordem de Serviço</h2>
+      <form id="formOS">
+        <div class="os-form-grid">
+          <div class="os-field"><label>Nome do cliente *</label><input id="osCliente" required maxlength="120"></div>
+          <div class="os-field"><label>WhatsApp / telefone *</label><input id="osTelefone" required maxlength="30" placeholder="(47) 99999-9999"></div>
+          <div class="os-field"><label>Marca do aparelho</label><input id="osMarca" maxlength="60"></div>
+          <div class="os-field"><label>Modelo do aparelho</label><input id="osModelo" maxlength="100"></div>
+          <div class="os-field"><label>IMEI (opcional)</label><input id="osImei" maxlength="30"></div>
+          <div class="os-field"><label>Valor estimado (R$)</label><input id="osValor" type="number" min="0" step="0.01"></div>
+          <div class="os-field full"><label>Defeito relatado pelo cliente</label><textarea id="osDefeito" maxlength="2000"></textarea></div>
+          <div class="os-field full"><label>Condição / aparência na entrada</label><textarea id="osCondicao" maxlength="2000" placeholder="Ex.: tela trincada, riscos, marcas de queda..."></textarea></div>
+          <div class="os-field full"><label>Acessórios recebidos</label><input id="osAcessorios" maxlength="500" placeholder="Ex.: aparelho, capa, carregador..."></div>
+          <div class="os-field full"><label>Serviço / diagnóstico / observações técnicas</label><textarea id="osServico" maxlength="2000"></textarea></div>
+          <div class="os-field full"><label>Observações adicionais</label><textarea id="osObservacoes" maxlength="2000"></textarea></div>
+        </div>
+        <div class="os-actions"><button class="primary-btn" type="submit" id="salvarOS">Salvar e gerar OS</button><button class="secondary-btn" type="reset">Limpar formulário</button></div>
+      </form>
+      <div class="os-list">
+        <h2 class="section-title">Ordens de Serviço cadastradas</h2>
+        <div class="filters">
+          <input id="buscaOS" type="text" placeholder="Buscar por número, cliente, telefone ou aparelho...">
+          <select id="filtroStatusOS">
+            <option value="">Todos os status</option><option>Recebido</option><option>Em diagnóstico</option>
+            <option>Aguardando aprovação</option><option>Aguardando peça</option><option>Em conserto</option>
+            <option>Concluído</option><option>Entregue</option><option>Cancelado</option>
+          </select>
+          <button class="refresh" type="button" id="atualizarOS">Atualizar OS</button>
+        </div>
+        <div class="table-wrapper"><table class="os-table">
+          <thead><tr><th>Nº OS</th><th>Cliente</th><th>Telefone</th><th>Aparelho</th><th>Entrada</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="listaOS"><tr><td colspan="7" class="message">Abra Ordens de Serviço para carregar.</td></tr></tbody>
+        </table></div>
+      </div>
+    </section>
+    <div id="printArea"></div>
 </main>
 
 <script>
@@ -512,6 +588,77 @@ document.getElementById("logout").addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
     window.location.href = "index.html";
 });
+
+
+let ordensServico = [];
+const STATUS_OS = ["Recebido","Em diagnóstico","Aguardando aprovação","Aguardando peça","Em conserto","Concluído","Entregue","Cancelado"];
+function mostrarAba(aba) {
+  const ag = aba === "agendamentos";
+  document.getElementById("areaAgendamentos").style.display = ag ? "block" : "none";
+  document.getElementById("areaOrdens").classList.toggle("active", !ag);
+}
+document.getElementById("btnAgendamentos").addEventListener("click",()=>mostrarAba("agendamentos"));
+document.getElementById("btnOrdens").addEventListener("click",async()=>{mostrarAba("ordens");await carregarOrdens();});
+function campoOS(id){return document.getElementById(id).value.trim();}
+document.getElementById("formOS").addEventListener("submit",async function(e){
+  e.preventDefault();
+  const b=document.getElementById("salvarOS"); b.disabled=true; b.textContent="Salvando...";
+  const registro={
+    customer_name:campoOS("osCliente"), customer_phone:campoOS("osTelefone"),
+    device_brand:campoOS("osMarca")||null, device_model:campoOS("osModelo")||null,
+    imei:campoOS("osImei")||null, reported_problem:campoOS("osDefeito")||null,
+    device_condition:campoOS("osCondicao")||null, accessories:campoOS("osAcessorios")||null,
+    service_description:campoOS("osServico")||null,
+    estimated_value:campoOS("osValor")?Number(campoOS("osValor")):null,
+    observations:campoOS("osObservacoes")||null
+  };
+  const {data,error}=await supabaseClient.from("service_orders").insert(registro).select("*").single();
+  b.disabled=false;b.textContent="Salvar e gerar OS";
+  if(error){alert("Erro ao salvar a OS: "+error.message);return;}
+  document.getElementById("formOS").reset(); await carregarOrdens(); imprimirOrdem(data);
+  alert("Ordem de Serviço salva com sucesso!");
+});
+async function carregarOrdens(){
+  const lista=document.getElementById("listaOS");lista.innerHTML='<tr><td colspan="7" class="message">Carregando...</td></tr>';
+  const {data,error}=await supabaseClient.from("service_orders").select("*").order("created_at",{ascending:false});
+  if(error){lista.innerHTML=`<tr><td colspan="7" class="message error">Erro ao carregar OS: ${escapar(error.message)}</td></tr>`;return;}
+  ordensServico=data||[];renderizarOrdens();
+}
+function numeroOS(os){return os.os_number!=null?String(os.os_number).padStart(6,"0"):String(os.id).padStart(6,"0");}
+function dataOS(d){return d?new Date(d).toLocaleDateString("pt-BR"):"—";}
+function renderizarOrdens(){
+  const lista=document.getElementById("listaOS"),busca=document.getElementById("buscaOS").value.toLowerCase(),filtro=document.getElementById("filtroStatusOS").value;
+  const itens=ordensServico.filter(o=>[numeroOS(o),o.customer_name,o.customer_phone,o.device_brand,o.device_model].join(" ").toLowerCase().includes(busca)&&(!filtro||o.status===filtro));
+  if(!itens.length){lista.innerHTML='<tr><td colspan="7" class="message">Nenhuma Ordem de Serviço encontrada.</td></tr>';return;}
+  lista.innerHTML=itens.map(o=>`<tr><td class="os-number">OS-${escapar(numeroOS(o))}</td><td>${escapar(o.customer_name)}</td><td>${escapar(o.customer_phone)}</td><td>${escapar([o.device_brand,o.device_model].filter(Boolean).join(" "))}</td><td>${dataOS(o.created_at)}</td><td><select onchange="alterarStatusOS(${Number(o.id)},this.value)">${STATUS_OS.map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></td><td><button class="secondary-btn" type="button" onclick="imprimirOSPorId(${Number(o.id)})">Imprimir</button></td></tr>`).join("");
+}
+async function alterarStatusOS(id,status){
+  const {error}=await supabaseClient.from("service_orders").update({status,updated_at:new Date().toISOString()}).eq("id",id);
+  if(error){alert("Erro ao atualizar status: "+error.message);await carregarOrdens();return;}
+  const o=ordensServico.find(x=>Number(x.id)===Number(id));if(o)o.status=status;renderizarOrdens();
+}
+function imprimirOSPorId(id){const o=ordensServico.find(x=>Number(x.id)===Number(id));if(o)imprimirOrdem(o);}
+function imprimirOrdem(o){
+  const item=(t,v,w=false)=>`<div class="print-item ${w?"print-wide":""}"><strong>${t}</strong>${escapar(v||"Não informado")}</div>`;
+  document.getElementById("printArea").innerHTML=`
+    <div class="print-head"><div><h1>HANGEL TECH</h1><div>Assistência Técnica de Celulares</div></div><div class="print-os-num">ORDEM DE SERVIÇO<br>OS-${escapar(numeroOS(o))}</div></div>
+    <div class="print-grid">
+      ${item("Data de entrada",dataOS(o.created_at))}${item("Status",o.status)}
+      ${item("Cliente",o.customer_name)}${item("Telefone",o.customer_phone)}
+      ${item("Marca",o.device_brand)}${item("Modelo",o.device_model)}
+      ${item("IMEI",o.imei)}${item("Valor estimado",o.estimated_value!=null?Number(o.estimated_value).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"Não informado")}
+      ${item("Defeito relatado",o.reported_problem,true)}${item("Condição do aparelho na entrada",o.device_condition,true)}
+      ${item("Acessórios recebidos",o.accessories,true)}${item("Serviço / diagnóstico",o.service_description,true)}
+      ${item("Observações",o.observations,true)}
+    </div>
+    <div class="print-signatures"><div>Assinatura do cliente</div><div>Assinatura do responsável técnico</div></div>
+    <div class="print-note">O cliente declara estar ciente das condições descritas nesta ordem de serviço e autoriza a avaliação do aparelho. Valores e prazos finais devem ser confirmados após diagnóstico e aprovação.</div>`;
+  window.print();
+}
+document.getElementById("buscaOS").addEventListener("input",renderizarOrdens);
+document.getElementById("filtroStatusOS").addEventListener("change",renderizarOrdens);
+document.getElementById("atualizarOS").addEventListener("click",carregarOrdens);
+
 
 iniciarPainel();
 </script>
